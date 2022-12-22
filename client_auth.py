@@ -71,8 +71,12 @@ def subtime_left(username):
 
 # Prompt the user to choose between login and registration
 while True:
-    choice = input("Would you like to login or register? (login/register): ")
-    if choice == "login":
+    print("""
+1.Login
+2.Register
+        """)
+    choice = input("Would you like to login or register?: ")
+    if choice == "1":
         # Prompt the user for their username and password
         username = input("Enter your username: ")
         password = getpass.getpass("Enter your password: ")
@@ -105,7 +109,7 @@ while True:
         else:
             # If no match is found, print an error message and go back to the beginning of the loop
             print("Invalid username, password or hardware id. Please try again or contact our staff members.")
-    elif choice == "register":
+    elif choice == "2":
         # Prompt the user for a new username and password + the key
         username = input("Enter a new username: ")
         password = getpass.getpass("Enter a new password: ")
@@ -133,7 +137,7 @@ while True:
         break
     else:
         # If the user enters an invalid choice, print an error message and go back to the beginning of the loop
-        print("Invalid choice. Please enter 'login' or 'register'.")
+        print("Invalid choice. Please enter '1'(login) or '2'(register).")
 
 # Close the cursor and connection to the database
 cursor.close()
