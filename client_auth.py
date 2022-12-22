@@ -32,15 +32,43 @@ def use_key(keycode, username):
         query = "SELECT duration FROM keycodes WHERE keycodes=%s"
         cursor.execute(query, (keycode,))
         key_duration = cursor.fetchone()[0]
-        print(key_duration)
         
         # adding subtime to the user and setting the activation date
         query = "UPDATE users SET activation_date=%s, sub_length=%s WHERE username=%s"
         cursor.execute(query, (datetime.now(), key_duration, username)) # adding current date as activation date and sub lenght from the key
         cnx.commit()
     else:
-        print("Key allready used or invalid!")
+        return False
         
+        
+def subtime_left(username):
+    
+    # checking the activation date
+    query = "SELECT activation_date FROM users WHERE username=%s"
+    cursor.execute(query, (username,))
+    date_str = cursor.fetchone()[0]
+    
+    # handling the case of no activation date existing due to the user never having an active sub
+    if date_str != '':
+        date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f") # convert string to datetime object
+    
+        now = datetime.now()
+        days_since = int((now - date).total_seconds() / 86400)
+    
+        # checking the sub_lenght
+        query = "SELECT sub_length FROM users WHERE username=%s"
+        cursor.execute(query, (username,))
+        sub_lenght = cursor.fetchone()[0]
+    
+        # calulating the days left
+        if days_since < int(sub_lenght):
+            return f"You have {int(sub_lenght) - days_since} day/s left on your sub!"
+        else:
+            return False
+    else:
+        return False
+    
+
 # Prompt the user to choose between login and registration
 while True:
     choice = input("Would you like to login or register? (login/register): ")
@@ -58,6 +86,19 @@ while True:
             query = "UPDATE users SET ip=%s WHERE username=%s"
             cursor.execute(query, (ip, username))
             cnx.commit()
+            
+            # check if the user has a sub
+            if subtime_left(username) == False:
+                print("No active subscription!")
+                
+                # give option to enter a license
+                key = input("Enter your key: ")
+                
+                # check if the key is valid
+                if use_key(key, username) == False:
+                    print("Key could not be activated. It may be invalid or allready in use!")
+                    continue
+
             # Print a success message and allow the user to proceed
             print("Login successful!")
             break
@@ -69,11 +110,24 @@ while True:
         username = input("Enter a new username: ")
         password = getpass.getpass("Enter a new password: ")
         key = input("Key: ")
+        
+        
+        # check if the username allready exists
+        query = "SELECT * FROM users WHERE username=%s"
+        cursor.execute(query, (username,))
+        result = cursor.fetchone()
+        if result:
+            print("Username allready taken! Please choose an unique one!")
+            continue
         # Insert the new username, password, and IP address into the database
         query = "INSERT INTO users (username, password, ip, hwid) VALUES (%s, %s, %s, %s)"
         cursor.execute(query, (username, password, ip, hwid()))
         cnx.commit()
         
+        # check the given key and add it to the user
+        if use_key(key, username) == False:
+            print("Key could not be activated. It may be invalid or allready in use!")
+            continue
         # Print a success message and allow the user to proceed
         print("Registration successful!")
         break
