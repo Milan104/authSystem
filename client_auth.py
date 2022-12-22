@@ -41,7 +41,7 @@ def use_key(keycode, username):
         return False
         
         
-def subtime_left(username):
+def subtime_left(username): # takes a username and returns false if the user has no subtime or an integer for the days of subtime left
     
     # checking the activation date
     query = "SELECT activation_date FROM users WHERE username=%s"

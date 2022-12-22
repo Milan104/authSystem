@@ -30,7 +30,7 @@ def use_key(keycode, username):
     else:
         print("Key allready used or invalid!")
         
-def subtime_left(username):
+def subtime_left(username): # takes a username and returns false if the user has no subtime or an integer for the days of subtime left
     
     # checking the activation date
     query = "SELECT activation_date FROM users WHERE username=%s"
@@ -48,7 +48,7 @@ def subtime_left(username):
         query = "SELECT sub_length FROM users WHERE username=%s"
         cursor.execute(query, (username,))
         sub_lenght = cursor.fetchone()[0]
-
+    
         # calulating the days left
         if days_since < int(sub_lenght):
             return f"You have {int(sub_lenght) - days_since} day/s left on your sub!"
