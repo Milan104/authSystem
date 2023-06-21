@@ -56,6 +56,5 @@ def subtime_left(username): # takes a username and returns false if the user has
             return False
     else:
         return False
-# use_key("obtxsfig", "huren")
 
 print(subtime_left("devtest"))
